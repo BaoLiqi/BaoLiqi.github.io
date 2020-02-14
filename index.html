@@ -153,6 +153,114 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-q2" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/02/14/q2/">剑指Offer_02_单例模式</a>
+    </h1>
+  
+
+        
+        <a href="/2020/02/14/q2/" class="archive-article-date">
+  	<time datetime="2020-02-14T14:52:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h1><h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>保证一个类仅有一个实例，并提供一个访问它的全局访问点。</p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>需要单例模式的经典场景是有这样一个类，它的开销（创建时间和占用空间）较大，且只需要一个实例就足够使用。因此限制外部通过new直接创建实例，这往往通过将无参构造函数声明为private来实现；在类的内部创建一次实例并维护对它的引用提供给外部；因为开销大，可以延迟它被创建的时机，直到被需要才创建。</p>
+<h2 id="实现方法"><a href="#实现方法" class="headerlink" title="实现方法"></a>实现方法</h2><h3 id="Java-饿汉式"><a href="#Java-饿汉式" class="headerlink" title="Java-饿汉式"></a>Java-饿汉式</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Singleton instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过static关键字同时满足了唯一性和线程安全，这是由JVM保证的。</p>
+<p>不足之处：实例化的时机是<strong>类加载时</strong>。因此资源利用效率相对低一些。</p>
+<h3 id="Java-懒汉式"><a href="#Java-懒汉式" class="headerlink" title="Java-懒汉式"></a>Java-懒汉式</h3><h4 id="实现1"><a href="#实现1" class="headerlink" title="实现1"></a>实现1</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">static</span> Singleton uniqueInstance;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (uniqueInstance == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">synchronized</span>(Singleton<span class="class">.<span class="keyword">class</span>) </span>&#123;</span><br><span class="line">                <span class="keyword">if</span> (uniqueInstance == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    uniqueInstance = <span class="keyword">new</span> Singleton();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> uniqueInstance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>volatile+synchronized关键字实现了锁，<strong>双检锁</strong>的模式避免了实例化后每次访问实例的线程同步开销。</p>
+<h4 id="实现2"><a href="#实现2" class="headerlink" title="实现2"></a>实现2</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">SingletonHolder</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Singleton INSTANCE = <span class="keyword">new</span> Singleton();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span> <span class="params">()</span></span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> SingletonHolder.INSTANCE;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面懒汉式的改进，内部定义nested class的方式巧妙地推迟了初始化时机。</p>
+<p>上述实现的思路：</p>
+<ul>
+<li><strong>private修饰无参构造函数，限制外部实例化</strong></li>
+<li><strong>只提供公有方法返回内部创建并维护的私有实例变量</strong></li>
+</ul>
+<h4 id="实现3"><a href="#实现3" class="headerlink" title="实现3"></a>实现3</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> Singleton &#123;</span><br><span class="line">    INSTANCE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>java中更简洁的实现。java的枚举很灵活，类本身的功能没有受到很多限制；而且本身满足单例模式的要求：唯一性，线程安全。枚举是不可被继承的，然而这并没有给这种实现带来额外的缺陷，因为<strong>其他单例类的实现也不能被继承</strong>：使用private修饰单例类的无参构造函数来防止直接new创建对象是必须的，而这和可被继承一定是矛盾的。</p>
+<h2 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h2><h3 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h3><p>反射可以访问私有成员和方法，因此用private限制外部实例化的实现都不能在此类场景下保证单例。网上许多文章提到的反序列化也是在过程中通过反射直接调用了构造函数，可以归为一类。而java中使用枚举的实现则可以限制这一点，因为JDK中做了限制，尝试通过反射创建实例时，如果类有enum修饰则抛出异常。所以单枚举实现的单例防护程度更高。</p>
+<h3 id="复用"><a href="#复用" class="headerlink" title="复用"></a>复用</h3><p>单例模式很常用，能否将这些代码复用呢，例如，继承/泛型？再回头分析上面归纳的实现思路中的设计是否还有效。</p>
+<h4 id="java实现"><a href="#java实现" class="headerlink" title="java实现"></a>java实现</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChildSingleton</span> <span class="keyword">extends</span> <span class="title">Singleton</span></span>&#123;</span><br><span class="line">    <span class="comment">//private无参构造函数，限制外部实例化</span></span><br><span class="line">    <span class="keyword">private</span> ChildSingleton&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>子类大概长这样，为了防止它被new实例化，默认构造函数必须private，它不像别的方法那样可被复用。这样两步中的第一步就完成了。</p>
+<p>然后是<strong>创建</strong>实例。因为用了这个private constructor的缘故，只有在这个子类中才能使用new创建它的实例。顺着这个思路，对这个实例的引用也要放在子类，因为继承来的静态字段也是共享的，而我们的目的是不同的子类有不同实例。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//很轻松就设计好了下面的实现，接下来只要去掉在这里完全没有一点用处的继承就行了</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChildSingleton</span> <span class="keyword">extends</span> <span class="title">Singleton</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ChildSingleton instance = <span class="keyword">new</span> ChildSingleton();</span><br><span class="line">    <span class="comment">//private无参构造函数，限制外部实例化</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">ChildSingleton</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ChildSingleton <span class="title">getInstance</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>既然排除掉了new的方法，创建实例的工作只能由上面提到的<strong>反射</strong>来做了。</p>
+<p>那么在哪里<strong>维护</strong>这个实例的引用？首先还是考虑在父类声明一个static字段，可是它被所有子类和本身共享，无法区分不同子类。在C#中，可以通过泛型解决这个问题，它实际上是创建了多个不同的类，自然也就不再是同一个字段；在java中则由于java泛型的本质不同无法这样做，甚至不允许在泛型类中拥有static字段（也许是因为允许这样做会让它看起来很不泛型？），那么想要在父类中维护引用就需要在父类中建立class到实例的映射表代替原来的static field。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">SingletonBase</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Map&lt;Class&lt;? extends SingletonBase&gt;, SingletonBase&gt; MAP = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;E extends SingletonBase&gt; <span class="function">E <span class="title">getInstance</span><span class="params">(Class&lt;E&gt; instanceClass)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(MAP.containsKey(instanceClass))&#123;</span><br><span class="line">            <span class="keyword">return</span> (E)MAP.get(instanceClass);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">synchronized</span> (MAP)&#123;</span><br><span class="line">                <span class="keyword">if</span>(!MAP.containsKey(instanceClass)) &#123;</span><br><span class="line">                    Constructor constructor = instanceClass.getDeclaredConstructor();</span><br><span class="line">                    constructor.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">                    E instance = (E) constructor.newInstance();</span><br><span class="line">                    MAP.put(instanceClass, instance);</span><br><span class="line">                    <span class="keyword">return</span> instance;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> (E)MAP.get(instanceClass);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ChildSingleton i = ChildSingleton.getInstance(ChildSingleton<span class="class">.<span class="keyword">class</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>需要在这里传递参数作为从MAP中获取实例的键。还没有找到在这里获取调用者实际类型的好方法。一顿操作的体会就是枚举单例确实好用，至少这一点网上的人没有骗我……</p>
+<p>在查资料的时候还看到一个挺好玩的文章，这里的双检锁因为检查的object对象是提前赋值的，所以失去了意义。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Object object = map.get(type);</span><br><span class="line"><span class="keyword">if</span> (object == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">synchronized</span> (map) &#123;</span><br><span class="line">            <span class="keyword">if</span>(object == <span class="keyword">null</span>)&#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="C-实现"><a href="#C-实现" class="headerlink" title="C#实现"></a>C#实现</h4><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public abstract class Singleton&lt;T&gt; where T : class</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> T Instance</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> Nested._instance;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">class</span> <span class="title">Nested</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//使用反射，用private构造函数创建</span></span><br><span class="line">        <span class="keyword">internal</span> <span class="keyword">static</span> T _instance = (T)<span class="keyword">typeof</span>(T).GetConstructor(</span><br><span class="line">                BindingFlags.Instance | BindingFlags.NonPublic,</span><br><span class="line">                <span class="literal">null</span>, <span class="keyword">new</span> Type[] &#123; &#125;, <span class="literal">null</span>).Invoke(<span class="keyword">new</span> <span class="keyword">object</span>[] &#123; &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public class Child : Singleton&lt;Child&gt;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Child</span>(<span class="params"></span>)</span> &#123; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因为C#泛型是不同的类，前面java中处理的许多问题就不存在了，最后不要忘记声明私有构造函数。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/02/14/q2/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-typora" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
